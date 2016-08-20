@@ -12,7 +12,6 @@ posY = 300
 
 velocidad = 5
 blanco = (255, 255, 255)
-derecha = True
 
 while True:
     ventana.fill(blanco)
