@@ -1,0 +1,57 @@
+Historia:
+	Nivel 1: 
+		Nombre miniboss: Nareurak
+		Sprite: Serpiente de rocas (tipo onix de pokemon)
+		Planeta: Nareus
+		Ambientancion: Desierto (arena, aldeas rusticas, cueva y cueva boss)
+		Cantidad de salas: 3 + Jefe (salas pequeñas)
+		Enemigos: Bestias y rocas vivientes (sprite del boss, pero mas pequeño)
+		Cristal: Amarrillo oscuro
+		
+	Nivel 2:
+		Nombre miniboss: Ape-zama
+		Sprite: Gorila
+		Planeta: Amazonis
+		Ambientancion: Tropical (selva, selva profunda, pie de arbol y arbol jefe)
+		Cantidad de salas: 3 + jefe (salas pequeñas)
+		Enemigos: Plantas carnivoras  y Simios 
+		Cristal: Verde
+		
+	Nivel 3:
+		Nombre miniboss: Koryalyan
+		Sprite: Sirena
+		Planeta: Karyalgas
+		Ambientancion: Acuatica (de mar abierto a ciudad submarina)
+		Cantidad de salas: 3 + boss (salas medianas)
+		Enemigos: Peces y sirenas
+		Cristal: Azul/Celeste
+
+	Nivel 4:
+		Nombre miniboss: Cypher
+		Sprite: Cyborg/Robot
+		Planeta: Nixatron
+		Ambientancion: Ciudad futurista (comienza en las calles y se va hacia el Centro de Ensablaje(ambiente de robots desarmados))
+		Cantidad de salas: 3 + boss (salas medianas)
+		Enemigos: Robots
+		Cristal: Gris
+
+	Nivel 5:
+		Nombre miniboss: Nexarien
+		Sprite: Humanoide parecido a enemigos
+		Planeta: Omega-nexus
+		Ambientancion: Laboratorio, termina en teletransporador que lleva al boss final
+		Sprite sala: tubos de ensayo, quimicos, etc.
+		Cantidad de salas: 3 + boss (salas grandes)
+		Enemigos: Humanoides alienigenas (tipico cabezon verde)
+		Cristal: Transparente
+
+	Nivel Final:
+		Nombre miniboss: Lyra
+		Sprite: Humano 
+		Planeta: -----
+		Ambientancion: Estacion espacial / Nave Nodriza
+		Cantidad de salas: 1 (sala grande)
+		Enemigos: mismos del nivel 5
+		Cristal: multicolor
+	
+	

@@ -1,0 +1,20 @@
+.Definicion de tipo de juego:
+	Arcade/rpg.
+Forma de juego:
+	movimiento: teclas direccionales
+	poderes: tecla + direccion del personaje (se consiguen a lo largo de la historia)
+	Guardado automatico del juego al finalizar el nivel junto con un score (este ultimo se guarda ya sea se termino el nivel o no)
+
+
+Historia: 
+	Personaje principal:
+		Raza: Humano astronauta(sprite neutral para los sexos)
+		Nombre: a elegir por el jugador
+		Objetivo: nuestro personaje esta explorando el sistema solar Kepler-444 en busca de los cristales astrales que han sido robados por Lyra, lider de los extraterrestres de kepler-444
+		nota: en cada nivel se encuentra uno de los cristales astrales que brinda un nuevo poder (al superar el ultimo, se puede ingresar al "modo arcade" que consta de una batalla infinita contra los extraterrestres, de la cual se guarda un score)
+
+	Antagonista:
+		Raza: Humano desterrado de la tierra que viaja al sistema solar kepler-444 para reclutar guerreros y tomar venganza
+		Nombre: Lyra 
+		Objetvo: robar todos cristales astrales para fortalecer sus tropas y colonizar nuestro sistema solar.
+		nota: a su vez existiran mini-bosses por cada nivel que responden a este personaje, siendo este el boss del nivel final
