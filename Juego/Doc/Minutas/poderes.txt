@@ -1,0 +1,39 @@
+Cada cristal mejora uno de los siguientes poderes:
+Poderes del protagonista:
+
+Disparo:
+Descripción: daño leve (quita 10% de la salud a los enemigos) que puede utilizarse constantemente
+Sprite: láser corto
+Tiempo de reutilización: no tiene
+Nota: puede ser mejorado por el poder 2. Con cada cristal conseguido, aumenta el daño.
+Otras características: a decidir
+
+1-Curación y velocidad aumentada:
+Descripción: restaura 20% de la vida y duplica la velocidad.
+Duración: a decidir
+Sprite: iluminación verde
+Tiempo de reutilización: 20 segundos
+
+2-Rayo láser continuado:
+Descripción: hace constante al ataque básico y aumenta su daño.
+Duración: 10 seg.
+Sprite: El del ataque básico pero con una línea continuada.
+Tiempo de reutilización: 15 seg.
+
+3-Bomba:
+Descripción cae una bomba en el lugar del personaje y daña a varios enemigos a su alrededor, ralentizándolos.
+Sprite: explosión radial
+Tiempo de reutilización: 15 seg.
+
+4-Golpe sónico:
+Descripción: ataque cuerpo a cuerpo de daño muy alto.
+Sprite: a decidir
+Tiempo de reutilización: 20 seg.
+
+Ataques de los enemigos:
+Nivel 1: solamente ataque cuerpo a cuerpo, sin poderes. Naneurak tiene ataque cuerpo a cuerpo con mayor velocidad.
+Nivel 2: ataque a distancia (bananas). Ape-sama tiene el mismo ataque de los enemigos + poder 2 con sprite amarillo.
+Nivel 3: ataque a distancia (disparo azul). Koryalyan tiene ataque cuerpo a cuerpo + poder 4 (con velocidad de movimiento aumentada y ataque reducido).
+Nivel 4: ataque a distancia + poder 3 cuando el personaje entra en un radio determinado (con radio y ataque reducido). Cypher tiene esos mismos ataques pero sin reducción.
+Nivel 5: ataque a distancia (básico) + poder 1 reducido. Nexarien tiene los mismos ataques pero sin reducción.
+Lyra: todos los poderes del protagonista sin las mejoras de los cristales.
