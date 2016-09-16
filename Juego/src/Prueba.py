@@ -1,19 +1,16 @@
 import pygame, sys
 from pygame.locals import *
 
-ancho = 800
-alto = 600
+ancho = 1024
+alto = 768
 
 class Personajes(pygame.sprite.Sprite):
         """Clase de los personajes"""
-        vida = 100
-        velocidad = 3
-        direccion = 'N' #Direcciones: Norte(N), Sur(S), Este(E), Oeste(O)
         
         def __init__(self):
                 pygame.sprite.Sprite.__init__(self)
-                self.ImagenPersonaje = pygame.image.load("Imagenes\Personaje.png")
-                self.rect = self.ImagenPersonaje.get_rect()
+                self.imagenPersonaje = pygame.image.load("Imagenes\Personaje.png")
+                self.rect = self.imagenPersonaje.get_rect()
                 self.rect.centerx = ancho/2
                 self.rect.centery = alto - 50
                 self.vida = 100
@@ -22,7 +19,7 @@ class Personajes(pygame.sprite.Sprite):
                 self.direccion = 'N' #Direcciones: Norte(N), Sur(S), Este(E), Oeste(O)
         
         def dibujar(self, superficie):
-                superficie.blit(self.ImagenPersonaje, self.rect)
+                superficie.blit(self.imagenPersonaje, self.rect)
 
         def moverIzquierda(self):
                 self.rect.centerx -= self.velocidad
@@ -62,6 +59,7 @@ class Personajes(pygame.sprite.Sprite):
                         return True
                 else:
                         return False
+                
         def disparar(self, superficie):
                 disparo = Disparo(self.rect.centerx, self.rect.centery, self.direccion)
                 self.listaDisparo.append(disparo)
@@ -76,6 +74,7 @@ class Disparo(pygame.sprite.Sprite):
                 self.rect = self.imagenDisparo.get_rect()
                 self.rect.centerx = posX
                 self.rect.centery = posY
+                self.danio = 10
                 self.velocidad = 5
                 self.direccion = direccion
                 
@@ -92,15 +91,81 @@ class Disparo(pygame.sprite.Sprite):
         def dibujar(self, superficie):
                 superficie.blit(self.imagenDisparo, self.rect)
 
+        def disparar(self, superficie):
+                disparo = Disparo(self.rect.centerx, self.rect.centery, self.direccion)
+                self.listaDisparo.append(disparo)
+
+class Enemigo(pygame.sprite.Sprite):
+        """Clase de los enemigos basicos"""
+
+        def __init__(self, posX, posY):
+                pygame.sprite.Sprite.__init__(self)
+                self.vida = 100
+                self.direccion = 'S'
+                self.imagenEnemigo = pygame.image.load("Imagenes/Enemigo1.png")
+                self.rect = self.imagenEnemigo.get_rect()
+                self.rect.centerx = posX
+                self.rect.top = posY
+                self.velocidad = 3
+                self.listaDisparo = []
+
+        def dibujar(self, superficie):
+                superficie.blit(self.imagenEnemigo, self.rect)
+
+        def sigueVivo(self):
+                if self.vida > 0:
+                        return True
+                else:
+                        return False
+
+        def moverIzquierda(self):
+                self.rect.centerx -= self.velocidad
+                self.__movimiento()
+                self.direccion = 'O'
+                #limite de pantalla()
+
+        def moverDerecha(self):
+                self.rect.centerx += self.velocidad
+                self.__movimiento()
+                self.direccion = 'E'
+                #limite de pantalla()
+        def moverArriba(self):
+                self.rect.centery -= self.velocidad
+                self.__movimiento()
+                self.direccion = 'N'
+		#limite pantalla()
+        def moverAbajo(self):
+                self.rect.centery += self.velocidad
+                self.__movimiento()
+                self.direccion = 'S'
+                #limite patalla()
+                
+        def __movimiento(self):
+                if self.sigueVivo():
+                    if self.rect.bottom > alto:
+                        self.rect.bottom = alto
+                    elif self.rect.top < 0:
+                        self.rect.top = 0
+                    elif self.rect.left < 0:
+                        self.rect.left = 0
+                    elif self.rect.right > ancho:
+                        self.rect.right = ancho
+        def recibirDanio(self, danio):
+                self.vida -= danio
+                
         
 """""""""""""""""""""""""""MAIN"""""""""""""""""""""""""""""""""        
 pygame.init()
 ventana = pygame.display.set_mode((ancho, alto))
 pygame.display.set_caption("Juego")
-jugador = Personajes()
 pygame.key.set_repeat(True)
+
 imagenFondo = pygame.image.load("Imagenes\Fondo.jpg")
 ventana.blit(imagenFondo, (0, 0))
+
+jugador = Personajes()
+enemigo = Enemigo(ancho/2, 1)
+
 
 while True:
         for evento in pygame.event.get():
@@ -120,12 +185,20 @@ while True:
                                 pygame.key.set_repeat(False)
                                 jugador.disparar(ventana)
                                 pygame.key.set_repeat(True)
+                                
         ventana.blit(imagenFondo, (0, 0))
         jugador.dibujar(ventana)
-        if len(jugador.listaDisparo) > 0: #aca recorro la lista de disparos pendientes
+        
+        if enemigo.sigueVivo():
+                enemigo.dibujar(ventana)
+                
+        if len(jugador.listaDisparo) > 0: #aca recorro la lista de disparos pendientes dej jugador
                 for x in jugador.listaDisparo:
                         x.dibujar(ventana)
                         x.trayectoria()
+                        if x.rect.colliderect(enemigo.rect):
+                                enemigo.recibirDanio(x.danio)
+                                jugador.listaDisparo.remove(x)
                         if x.rect.top < -20:
                                 jugador.listaDisparo.remove(x)
                         elif x.rect.bottom > alto+20:
