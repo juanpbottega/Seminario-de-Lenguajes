@@ -14,22 +14,29 @@ class Personajes(pygame.sprite.Sprite):
                 self.rect.centerx = ancho/2
                 self.rect.centery = alto - 50
                 self.vida = 100
+                self.maxVida=100
                 self.velocidad = 5
                 self.listaDisparo = []
+                self.listaCuracion=[]
                 self.ultimoDisparo = 0
                 self.ultimaCuracion = 0
                 self.direccion = 'N' #Direcciones: Norte(N), Sur(S), Este(E), Oeste(O)
                 self.Fuente = pygame.font.SysFont("Arial", 30)
-                
+                self.cooldownCuracion=0
         
         def dibujar(self, superficie):
                 superficie.blit(self.imagenPersonaje, self.rect)
                 self.mostrarVida(superficie)
+                self.mostrarCoolCuracion(superficie)
                 
         def mostrarVida(self, superficie):
                 texto_vida = self.Fuente.render("Vida: " + str(self.vida), 0, (255, 0, 0))
                 superficie.blit(texto_vida, (5, 5))
-
+                
+        def mostrarCoolCuracion(self,superficie):
+                texto_curacion = self.Fuente.render("Curacion: " + str(self.cooldownCuracion), 0, (255, 0, 0))
+                superficie.blit(texto_curacion, (150, 5))
+                
         def moverIzquierda(self):
                 self.rect.centerx -= self.velocidad
                 self.__movimiento()
@@ -68,17 +75,56 @@ class Personajes(pygame.sprite.Sprite):
                         return True
                 else:
                         return False
+                
+        def aumentarVida(self,tiempo):
+                aumento=Curacion(self.rect.centerx,self.rect.centery,self.vida)
 
+                if tiempo >= self.ultimaCuracion + aumento.tiempoReutilizacion:
+                        self.vida+=aumento.cantAumento
+                        if self.vida>= self.maxVida:
+                                self.vida=self.maxVida
+                                self.listaCuracion.append(aumento)        
+                                self.ultimaCuracion=tiempo
+                                self.cooldownCuracion=aumento.tiempoReutilizacion
+                                
+                """el if lo quise hacer en el metodo aumentar de la clase Curacion pero no me salio"""
         def recibirDanio(self, danio):
                 self.vida -= danio
                 
         def disparar(self, tiempo):
                 disparo = Disparo(self.rect.centerx, self.rect.centery, self.direccion)
+                
+                
                 if tiempo >= self.ultimoDisparo + disparo.tiempoReutilizacion:
                         self.listaDisparo.append(disparo)
                         self.ultimoDisparo = tiempo
+        
+                
+
 
                 
+class Curacion(pygame.sprite.Sprite):
+        """Clase Curacion y aumento de Velocidad"""
+
+        def __init__(self, posX, posY, vida):
+                pygame.sprite.Sprite.__init__(self)
+                self.imagenCuracion = pygame.image.load("Imagenes\Enemigo1.png")
+                self.rect = self.imagenCuracion.get_rect()
+                self.rect.centerx = posX
+                self.rect.centery = posY
+                self.cantAumento = 10
+                self.auxiliar=0
+                self.tiempoReutilizacion=5
+              
+        """def aumentar(self):"""
+        
+        def dibujar(self, superficie):
+                superficie.blit(self.imagenCuracion,self.rect)
+
+                     
+                     
+                     
+                     
 
         
                 
@@ -110,7 +156,9 @@ class Disparo(pygame.sprite.Sprite):
                 superficie.blit(self.imagenDisparo, self.rect)
 
 
+
 class Enemigo(pygame.sprite.Sprite):
+        
         """Clase de los enemigos basicos"""
 
         def __init__(self, posX, posY):
@@ -217,8 +265,13 @@ tiempo = 1
 while jugador.sigueVivo():
         tiempo_milesimas = pygame.time.get_ticks()/1000
         if tiempo == tiempo_milesimas:
-                print tiempo 
+                print tiempo
                 tiempo += 1
+                
+                if jugador.cooldownCuracion>0:    
+                        print jugador.cooldownCuracion
+                        jugador.cooldownCuracion-=1
+                        
         """if not jugador.sigueVivo():
                 Fuente = pygame.font.SysFont("Arial", 20)
                 texto_fin = Fuente.render("Perdiste" , 0, (0, 0, 0))
@@ -238,9 +291,13 @@ while jugador.sigueVivo():
                                 jugador.moverAbajo()
                         elif evento.key == K_SPACE:
                                 jugador.disparar(tiempo)
+                if evento.type == pygame.KEYUP:
+                        if evento.key == K_1:
+                                jugador.aumentarVida(tiempo)
 
         ventana.blit(imagenFondo, (0, 0))
         jugador.dibujar(ventana)
+        
         
         if enemigo.sigueVivo():
                 enemigo.mover(jugador)
