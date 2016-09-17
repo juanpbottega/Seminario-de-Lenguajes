@@ -16,7 +16,8 @@ class Personajes(pygame.sprite.Sprite):
                 self.vida = 100
                 self.velocidad = 5
                 self.listaDisparo = []
-                self.reutilizacionDisparo = 0
+                self.ultimoDisparo = 0
+                self.ultimaCuracion = 0
                 self.direccion = 'N' #Direcciones: Norte(N), Sur(S), Este(E), Oeste(O)
                 self.Fuente = pygame.font.SysFont("Arial", 30)
                 
@@ -63,7 +64,7 @@ class Personajes(pygame.sprite.Sprite):
                         self.rect.right = ancho
                 
         def sigueVivo(self):
-                if self.vida > 0:
+                if self.vida > 1:
                         return True
                 else:
                         return False
@@ -71,9 +72,13 @@ class Personajes(pygame.sprite.Sprite):
         def recibirDanio(self, danio):
                 self.vida -= danio
                 
-        def disparar(self):
+        def disparar(self, tiempo):
                 disparo = Disparo(self.rect.centerx, self.rect.centery, self.direccion)
-                self.listaDisparo.append(disparo)
+                if tiempo >= self.ultimoDisparo + disparo.tiempoReutilizacion:
+                        self.listaDisparo.append(disparo)
+                        self.ultimoDisparo = tiempo
+
+                
 
         
                 
@@ -87,7 +92,7 @@ class Disparo(pygame.sprite.Sprite):
                 self.rect.centerx = posX
                 self.rect.centery = posY
                 self.danio = 10
-                self.velocidad = 8
+                self.velocidad = 6
                 self.direccion = direccion
                 self.tiempoReutilizacion = 1
                 
@@ -111,6 +116,7 @@ class Enemigo(pygame.sprite.Sprite):
         def __init__(self, posX, posY):
                 pygame.sprite.Sprite.__init__(self)
                 self.vida = 100
+                self.Fuente = pygame.font.SysFont("Arial", 20)
                 self.direccion = 'S'
                 self.imagenEnemigo = pygame.image.load("Imagenes/Enemigo1.png")
                 self.rect = self.imagenEnemigo.get_rect()
@@ -122,6 +128,11 @@ class Enemigo(pygame.sprite.Sprite):
 
         def dibujar(self, superficie):
                 superficie.blit(self.imagenEnemigo, self.rect)
+                self.mostrarVida(superficie)
+
+        def mostrarVida(self, superficie):
+                texto_vida = self.Fuente.render("Vida: " + str(self.vida), 0, (255, 0, 0))
+                superficie.blit(texto_vida, (self.rect.left +5, self.rect.bottom ))
 
         def disparar(self, tiempo):
                 disparo = Disparo(self.rect.centerx, self.rect.centery, self.direccion)
@@ -203,13 +214,17 @@ jugador = Personajes()
 enemigo = Enemigo(ancho/2, 1)
 tiempo = 1
 
-while True:
+while jugador.sigueVivo():
         tiempo_milesimas = pygame.time.get_ticks()/1000
         if tiempo == tiempo_milesimas:
-                print tiempo
+                print tiempo 
                 tiempo += 1
+        """if not jugador.sigueVivo():
+                Fuente = pygame.font.SysFont("Arial", 20)
+                texto_fin = Fuente.render("Perdiste" , 0, (0, 0, 0))
+                ventana.blit(texto_fin, (ancho/2, alto/2))"""
         for evento in pygame.event.get():
-                if evento.type == QUIT or not jugador.sigueVivo(): #agregar la salida al menu y guardado de score
+                if evento.type == QUIT: #agregar la salida al menu y guardado de score
                         pygame.quit()
                         sys.exit()
                 if evento.type == pygame.KEYDOWN:
@@ -222,11 +237,8 @@ while True:
                         elif evento.key == K_DOWN:
                                 jugador.moverAbajo()
                         elif evento.key == K_SPACE:
-                                pygame.key.set_repeat(False)
-                                jugador.disparar()
-                                pygame.key.set_repeat(True)
+                                jugador.disparar(tiempo)
 
-        
         ventana.blit(imagenFondo, (0, 0))
         jugador.dibujar(ventana)
         
@@ -236,7 +248,7 @@ while True:
                 if enemigo.enRango(jugador):
                         enemigo.disparar(tiempo)
 
-        if len(jugador.listaDisparo) > 0: #aca recorro la lista de disparos pendientes dej jugador
+        if len(jugador.listaDisparo) > 0: #aca recorro la lista de disparos pendientes del jugador
                 for x in jugador.listaDisparo:
                         x.dibujar(ventana)
                         x.trayectoria()
@@ -270,3 +282,5 @@ while True:
                                 
         pygame.display.update()
         
+pygame.quit()
+sys.exit()
