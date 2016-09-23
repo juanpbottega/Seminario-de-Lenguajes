@@ -14,7 +14,7 @@ class Personajes(pygame.sprite.Sprite):
                 self.rect = self.imagenPersonaje.get_rect()
                 self.rect.centerx = ancho/2
                 self.rect.centery = alto - 50
-                self.vida = 1000
+                self.vida = 100
                 self.maxVida=100
                 self.velocidad = 5
                 self.listaDisparo = []
