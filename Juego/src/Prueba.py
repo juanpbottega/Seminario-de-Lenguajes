@@ -14,7 +14,7 @@ class Personajes(pygame.sprite.Sprite):
                 self.rect = self.imagenPersonaje.get_rect()
                 self.rect.centerx = ancho/2
                 self.rect.centery = alto - 50
-                self.vida = 100
+                self.vida = 1000
                 self.maxVida=100
                 self.velocidad = 5
                 self.listaDisparo = []
@@ -109,12 +109,10 @@ class Personajes(pygame.sprite.Sprite):
                         self.ultimoDisparo = tiempo
                         
         def disparoLaser(self, tiempo):
-                 disparo=Disparo(self.rect.centerx,self.rect.centery,self.direccion,2,6)
-                 
+                 disparo=Disparo(self.rect.centerx,self.rect.centery,self.direccion,2,7)
                  if tiempo >= self.ultimoDisparoLaser + disparo.tiempoReutilizacionLaser:
-                        for d in range (5,15):
-                                
-                                otrodisparo=Disparo(self.rect.centerx,self.rect.centery,self.direccion,2,d+1)
+                        for d in range (1, 10):
+                                otrodisparo=Disparo(self.rect.centerx,self.rect.centery,self.direccion,2, 5 + d )
                                 self.listaDisparo.append(otrodisparo)
                         self.listaDisparo.append(disparo)
                         self.ultimoDisparoLaser = tiempo
@@ -206,6 +204,7 @@ class Enemigo(pygame.sprite.Sprite):
                 self.rect.centerx = posX
                 self.rect.top = posY
                 self.velocidad = 2
+                self.radioEntreEnemigos = 140 #Pixeles 
                 self.listaDisparo = []
                 self.ultimoDisparo = 0
 
@@ -262,20 +261,48 @@ class Enemigo(pygame.sprite.Sprite):
                         self.rect.right = ancho
 
         def mover(self, jugador):
-                if abs(self.rect.centerx - jugador.rect.centerx) >= abs(self.rect.centery - jugador.rect.centery):
-                        if self.rect.centerx > jugador.rect.centerx:
+                if abs(self.rect.centerx - jugador.rect.centerx) < abs(self.rect.centery - jugador.rect.centery):
+                        if self.rect.centerx >= jugador.rect.right:
                                 self.moverIzquierda()
-                        elif self.rect.centerx < jugador.rect.centerx:
+                        elif self.rect.centerx <= jugador.rect.left:
                                 self.moverDerecha()
-                else:
-                        if self.rect.centery > jugador.rect.centery:
+                        elif self.rect.centerx < jugador.rect.right and self.rect.centerx > jugador.rect.left and self.rect.centery > jugador.rect.centery:
                                 self.moverArriba()
-                        elif self.rect.centery < jugador.rect.centery:
+                        elif self.rect.centerx < jugador.rect.right and self.rect.centerx > jugador.rect.left and self.rect.centery < jugador.rect.centery:
                                 self.moverAbajo()
-
-                
+                else:
+                        if self.rect.centery <= jugador.rect.top:
+                                self.moverAbajo()
+                        elif self.rect.centery >= jugador.rect.bottom:
+                                self.moverArriba()
+                        elif self.rect.centery <= jugador.rect.bottom and self.rect.centery >= jugador.rect.top and self.rect.centerx > jugador.rect.centerx:
+                                self.moverIzquierda()
+                        elif self.rect.centery <= jugador.rect.bottom and self.rect.centery >= jugador.rect.top and self.rect.centerx < jugador.rect.centerx:
+                                self.moverDerecha()
+                                
         def recibirDanio(self, danio):
                 self.vida -= danio
+
+        def alejarse(self, otroenemigo):
+                if self.rect.centerx > otroenemigo.rect.centerx:
+                        self.moverDerecha()
+                elif self.rect.centerx < otroenemigo.rect.centerx:
+                        self.moverDerecha()
+                elif self.rect.centerx == otroenemigo.rect.centerx:
+                        if self.rect.centery < otroenemigo.rect.centery:
+                                self.moverArriba()
+                        else:
+                                self.moverAbajo()
+                if self.rect.centery > otroenemigo.rect.centery:
+                        self.moverAbajo()
+                elif self.rect.centery < otroenemigo.rect.centery:
+                        self.moverArriba()
+                elif self.rect.centery == otroenemigo.rect.centery:
+                        if self.rect.centerx < otroenemigo.rect.centerx:
+                                self.moverIzquierda()
+                        else:
+                                self.moverDerecha()
+            
 
         def enRango(self, jugador):
                 return ((enemigo.rect.left < jugador.rect.centerx and enemigo.rect.right > jugador.rect.centerx and (self.direccion == 'S' or self.direccion == 'N')) or
@@ -298,7 +325,6 @@ imagenFondo = pygame.image.load("Imagenes\Fondo.jpg")
 ventana.blit(imagenFondo, (0, 0))
 
 jugador = Personajes()
-##enemigo = Enemigo(ancho/2, 1)
 tiempo = 1
 
 derechaApretada = False
@@ -318,11 +344,11 @@ while jugador.sigueVivo():
                 tiempo += 1
                 
                 if jugador.cooldownCuracion>0:    
-##                      print jugador.cooldownCuracion
+##                        print jugador.cooldownCuracion
                         jugador.cooldownCuracion-=1
-##
+
                 if jugador.cooldownLaser>0:
-                        print jugador.cooldownLaser
+##                        print jugador.cooldownLaser
                         jugador.cooldownLaser-=1
                         
         for evento in pygame.event.get():
@@ -372,17 +398,17 @@ while jugador.sigueVivo():
         ventana.blit(imagenFondo, (0, 0))
         jugador.dibujar(ventana)
         
-        """
-        if enemigo.sigueVivo():
-                enemigo.mover(jugador)
-                enemigo.dibujar(ventana)
-                if enemigo.enRango(jugador):
-                        enemigo.disparar(tiempo)
-        """
+
         if len(listaEnemigos) > 0:
                 for enemigo in listaEnemigos:
                         enemigo.dibujar(ventana)
                         enemigo.mover(jugador)
+                        for otroEnemigo in listaEnemigos:
+                                if not enemigo == otroEnemigo:
+                                        if enemigo.rect.colliderect(otroEnemigo.rect):
+                                                enemigo.alejarse(otroEnemigo)
+
+                        # AGREGAR LAS COLISIONES PARA QUE NO SE SUPERPONGAN
                         if not enemigo.sigueVivo():
                                 listaEnemigos.remove(enemigo)
                         elif enemigo.enRango(jugador):
@@ -408,11 +434,14 @@ while jugador.sigueVivo():
                         x.dibujar(ventana)
                         x.trayectoria()
                         if len(listaEnemigos) > 0:
-                                
+                                enemigoGolpeado = False
                                 for enemigo in listaEnemigos:
-                                        if x.rect.colliderect(enemigo.rect):
-                                                enemigo.recibirDanio(x.danio)
-                                                jugador.listaDisparo.remove(x)
+                                        if not enemigoGolpeado:
+                                                if x.rect.colliderect(enemigo.rect):
+                                                        enemigoGolpeado = True
+                                                if enemigoGolpeado:
+                                                        enemigo.recibirDanio(x.danio)
+                                                        jugador.listaDisparo.remove(x)
                         if x.rect.top < -20:
                                 jugador.listaDisparo.remove(x)
                         elif x.rect.bottom > alto+20:
