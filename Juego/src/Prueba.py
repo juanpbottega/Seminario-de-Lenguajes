@@ -6,13 +6,17 @@ class Personajes(pygame.sprite.Sprite):
         """Clase de los personajes"""
         def cargarImagenes(self, imagenPersonaje):
                 imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Arriba/personaje_quieto_arriba.png"))
-##                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Arriba/presonaje_caminando_arriba.png")
-##                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Arriba/presonaje_caminando_arriba2.png")
+                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Arriba/personaje_caminando_arriba.png"))
+                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Arriba/personaje_caminando2_arriba.png")) #Del 0 al 2 son arriba
                 imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Abajo/personaje_quieto_abajo.png"))
-##                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Abajo/personaje_caminando_abajo.png"))
-##                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Abajo/personaje_caminando2_abajo.png"))
+                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Abajo/personaje_caminando_abajo.png"))
+                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Abajo/personaje_caminando2_abajo.png")) #Del 3 al 5 son abajo
                 imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Izquierda/personaje_quieto_izquierda.png"))
+                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Izquierda/personaje_caminando_izquierda.png"))
+                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Izquierda/personaje_caminando2_izquierda.png")) #Del 6 al 8 son izquierda
                 imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Derecha/personaje_quieto_derecha.png"))
+                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Derecha/personaje_caminando_derecha.png"))
+                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Derecha/personaje_caminando2_derecha.png")) #Del 9 al 11 son derecha
                 
         def __init__(self):
                 pygame.sprite.Sprite.__init__(self)
@@ -22,6 +26,9 @@ class Personajes(pygame.sprite.Sprite):
                 self.rect = self.imagenPersonaje[0].get_rect()
                 self.rect.centerx = ancho/2
                 self.rect.centery = alto - 50
+                self.caminando = False
+                self.ultimaCaminata = 0
+                self.tiempoUltimaCaminata = 0
                 self.vida = 100
                 self.maxVida=100
                 self.velocidad = 5
@@ -35,15 +42,83 @@ class Personajes(pygame.sprite.Sprite):
                 self.cooldownCuracion=0
                 self.cooldownLaser=0
         
-        def dibujar(self, superficie):
+        
+        def dibujar(self, superficie, tiempo):
+                print tiempo
                 if self.direccion == 'N':
-                        superficie.blit(self.imagenPersonaje[0], self.rect)
+                        if self.caminando and self.tiempoUltimaCaminata + 35 > tiempo and self.ultimaCaminata >= 0 and self.ultimaCaminata < 3:
+                                        superficie.blit(self.imagenPersonaje[self.ultimaCaminata], self.rect)
+                                        
+                        elif self.caminando and self.tiempoUltimaCaminata + 35 <= tiempo:
+                                        self.tiempoUltimaCaminata = tiempo
+                                        if self.ultimaCaminata == 0:
+                                               superficie.blit(self.imagenPersonaje[1], self.rect)
+                                               self.ultimaCaminata = 1
+
+                                        elif self.ultimaCaminata == 1:
+                                               superficie.blit(self.imagenPersonaje[2], self.rect)
+                                               self.ultimaCaminata = 2
+                                        
+                                        else:
+                                               superficie.blit(self.imagenPersonaje[1], self.rect)
+                                               self.ultimaCaminata = 1
+                        else:
+                                superficie.blit(self.imagenPersonaje[0], self.rect)
+                                self.ultimaCaminata = 0
+                        
                 elif self.direccion == 'S':
-                        superficie.blit(self.imagenPersonaje[1], self.rect)
+                        if self.caminando and self.tiempoUltimaCaminata + 35 > tiempo and self.ultimaCaminata >= 3 and self.ultimaCaminata < 6:
+                                        superficie.blit(self.imagenPersonaje[self.ultimaCaminata], self.rect)
+                                        
+                        elif self.caminando and self.tiempoUltimaCaminata + 35 <= tiempo:
+                                       self.tiempoUltimaCaminata = tiempo
+                                       if self.ultimaCaminata == 3:
+                                               superficie.blit(self.imagenPersonaje[4], self.rect)
+                                               self.ultimaCaminata = 4
+                                       elif self.ultimaCaminata == 4:
+                                               superficie.blit(self.imagenPersonaje[5], self.rect)
+                                               self.ultimaCaminata = 5
+                                       else:
+                                               superficie.blit(self.imagenPersonaje[4], self.rect)
+                                               self.ultimaCaminata = 4
+                        else:
+                                superficie.blit(self.imagenPersonaje[3], self.rect)
+                                
                 elif self.direccion == 'O':
-                        superficie.blit(self.imagenPersonaje[2], self.rect)
+                        if self.caminando and self.tiempoUltimaCaminata + 35 > tiempo and self.ultimaCaminata >= 6 and self.ultimaCaminata < 9:
+                                        superficie.blit(self.imagenPersonaje[self.ultimaCaminata], self.rect)
+                                        
+                        elif self.caminando and self.tiempoUltimaCaminata + 35 <= tiempo:
+                                       self.tiempoUltimaCaminata = tiempo
+                                       if self.ultimaCaminata == 6:
+                                               superficie.blit(self.imagenPersonaje[7], self.rect)
+                                               self.ultimaCaminata = 7
+                                       elif self.ultimaCaminata == 7:
+                                               superficie.blit(self.imagenPersonaje[8], self.rect)
+                                               self.ultimaCaminata = 8
+                                       else:
+                                               superficie.blit(self.imagenPersonaje[7], self.rect)
+                                               self.ultimaCaminata = 7
+                        else:
+                                superficie.blit(self.imagenPersonaje[6], self.rect)
+
                 elif self.direccion == 'E':
-                        superficie.blit(self.imagenPersonaje[3], self.rect)
+                        if self.caminando and self.tiempoUltimaCaminata + 35 > tiempo and self.ultimaCaminata >= 9 and self.ultimaCaminata < 12:
+                                        superficie.blit(self.imagenPersonaje[self.ultimaCaminata], self.rect)
+                                        
+                        elif self.caminando and self.tiempoUltimaCaminata + 35 <= tiempo:
+                                       self.tiempoUltimaCaminata = tiempo
+                                       if self.ultimaCaminata == 9:
+                                               superficie.blit(self.imagenPersonaje[10], self.rect)
+                                               self.ultimaCaminata = 10
+                                       elif self.ultimaCaminata == 10:
+                                               superficie.blit(self.imagenPersonaje[11], self.rect)
+                                               self.ultimaCaminata = 11
+                                       else:
+                                               superficie.blit(self.imagenPersonaje[10], self.rect)
+                                               self.ultimaCaminata = 10
+                        else:
+                                superficie.blit(self.imagenPersonaje[9], self.rect)
                 self.mostrarVida(superficie)
                 self.mostrarCoolCuracion(superficie)
                 self.mostrarCoolLaser(superficie)
@@ -357,8 +432,8 @@ listaEnemigos = []
 crearListaEnemigos(listaEnemigos, 3)
 
 while jugador.sigueVivo():
-        tiempo_milesimas = pygame.time.get_ticks()/1000
-        if tiempo == tiempo_milesimas:
+        tiempo_milesimas = pygame.time.get_ticks()/10
+        if tiempo == tiempo_milesimas/100:
 ##                print tiempo
                 tiempo += 1
                 
@@ -381,6 +456,7 @@ while jugador.sigueVivo():
                                 derechaApretada = True
                         elif evento.key == K_UP:
                                 arribaApretada = True
+                                jugador.caminando = True #ojo aca
                         elif evento.key == K_DOWN:
                                 abajoApretada = True
                         elif evento.key == K_1:
@@ -398,13 +474,15 @@ while jugador.sigueVivo():
                                 derechaApretada = False
                         elif evento.key == K_UP:
                                 arribaApretada = False
+                                jugador.caminando = False #ojo aca
                         elif evento.key == K_DOWN:
                                 abajoApretada = False     
                         elif evento.key == K_2 :
                                 disparoLaserApretado=False
                         elif evento.key ==K_SPACE:
                                 disparoApretado=False
-                        
+                                
+        ##agregar el caminando afuera con la pregunta para todos los booleanos        
                       
         if disparoLaserApretado:      
                 jugador.disparoLaser(tiempo)                  
@@ -413,7 +491,13 @@ while jugador.sigueVivo():
                         
         jugador.mover(izquierdaApretada, derechaApretada, arribaApretada, abajoApretada)
         ventana.blit(imagenFondo, (0, 0))
-        jugador.dibujar(ventana)
+        
+        if arribaApretada or abajoApretada or izquierdaApretada or derechaApretada:
+                jugador.caminando = True
+        else:
+                jugador.caminando = False
+        
+        jugador.dibujar(ventana, tiempo_milesimas)
 
         if len(listaEnemigos) > 0:
                 for enemigo in listaEnemigos:
