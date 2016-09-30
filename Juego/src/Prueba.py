@@ -2,16 +2,24 @@ import pygame, sys
 from pygame.locals import *
 from random import randint
 
-ancho = 1024
-alto = 768
-
 class Personajes(pygame.sprite.Sprite):
         """Clase de los personajes"""
-        
+        def cargarImagenes(self, imagenPersonaje):
+                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Arriba/personaje_quieto_arriba.png"))
+##                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Arriba/presonaje_caminando_arriba.png")
+##                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Arriba/presonaje_caminando_arriba2.png")
+                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Abajo/personaje_quieto_abajo.png"))
+##                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Abajo/personaje_caminando_abajo.png"))
+##                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Abajo/personaje_caminando2_abajo.png"))
+                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Izquierda/personaje_quieto_izquierda.png"))
+                imagenPersonaje.append(pygame.image.load("Imagenes/Personaje/Derecha/personaje_quieto_derecha.png"))
+                
         def __init__(self):
                 pygame.sprite.Sprite.__init__(self)
-                self.imagenPersonaje = pygame.image.load("Imagenes\Personaje.png")
-                self.rect = self.imagenPersonaje.get_rect()
+                self.imagenPersonaje = []
+                self.cargarImagenes(self.imagenPersonaje);
+##                self.imagenPersonaje = pygame.image.load("Imagenes\Personaje.png")
+                self.rect = self.imagenPersonaje[0].get_rect()
                 self.rect.centerx = ancho/2
                 self.rect.centery = alto - 50
                 self.vida = 100
@@ -28,7 +36,14 @@ class Personajes(pygame.sprite.Sprite):
                 self.cooldownLaser=0
         
         def dibujar(self, superficie):
-                superficie.blit(self.imagenPersonaje, self.rect)
+                if self.direccion == 'N':
+                        superficie.blit(self.imagenPersonaje[0], self.rect)
+                elif self.direccion == 'S':
+                        superficie.blit(self.imagenPersonaje[1], self.rect)
+                elif self.direccion == 'O':
+                        superficie.blit(self.imagenPersonaje[2], self.rect)
+                elif self.direccion == 'E':
+                        superficie.blit(self.imagenPersonaje[3], self.rect)
                 self.mostrarVida(superficie)
                 self.mostrarCoolCuracion(superficie)
                 self.mostrarCoolLaser(superficie)
@@ -43,8 +58,6 @@ class Personajes(pygame.sprite.Sprite):
         def mostrarCoolLaser(self,superficie):
                 texto_laser = self.Fuente.render("Laser: " + str(self.cooldownLaser), 0, (0, 255, 255))
                 superficie.blit(texto_laser, (300, 5))
-                
-        
                 
         def mover(self, izq, der, arr, aba):
                 if izq:
@@ -109,7 +122,7 @@ class Personajes(pygame.sprite.Sprite):
                         self.ultimoDisparo = tiempo
                         
         def disparoLaser(self, tiempo):
-                 disparo=Disparo(self.rect.centerx,self.rect.centery,self.direccion,2,7)
+                 disparo=Disparo(self.rect.centerx,self.rect.centery,self.direccion,2,16)
                  if tiempo >= self.ultimoDisparoLaser + disparo.tiempoReutilizacionLaser:
                         for d in range (1, 10):
                                 otrodisparo=Disparo(self.rect.centerx,self.rect.centery,self.direccion,2, 5 + d )
@@ -165,7 +178,12 @@ class Disparo(pygame.sprite.Sprite):
         
         def __init__(self, posX, posY, direccion,danio,velocidad):
                 pygame.sprite.Sprite.__init__(self)
-                self.imagenDisparo = pygame.image.load("Imagenes/Disparo.png")
+                
+                if direccion == 'N' or direccion == 'S':
+                        self.imagenDisparo = pygame.image.load("Imagenes/Disparo_laser_vertical.png")
+                else:
+                        self.imagenDisparo = pygame.image.load("Imagenes/Disparo_laser_horizontal.png")
+                        
                 self.rect = self.imagenDisparo.get_rect()
                 self.rect.centerx = posX
                 self.rect.centery = posY
@@ -202,9 +220,8 @@ class Enemigo(pygame.sprite.Sprite):
                 self.imagenEnemigo = pygame.image.load("Imagenes/Enemigo1.png")
                 self.rect = self.imagenEnemigo.get_rect()
                 self.rect.centerx = posX
-                self.rect.top = posY
+                self.rect.centery = posY
                 self.velocidad = 2
-                self.radioEntreEnemigos = 140 #Pixeles 
                 self.listaDisparo = []
                 self.ultimoDisparo = 0
 
@@ -317,15 +334,17 @@ def crearListaEnemigos(listaEnemigos, cantidad):
         
 """""""""""""""""""""""""""MAIN"""""""""""""""""""""""""""""""""        
 pygame.init()
+ancho = 1024
+alto = 768
 ventana = pygame.display.set_mode((ancho, alto))
 pygame.display.set_caption("Juego")
-pygame.key.set_repeat(True)
+
 
 imagenFondo = pygame.image.load("Imagenes\Fondo.jpg")
 ventana.blit(imagenFondo, (0, 0))
 
 jugador = Personajes()
-tiempo = 1
+tiempo = 5
 
 derechaApretada = False
 izquierdaApretada = False
@@ -366,14 +385,12 @@ while jugador.sigueVivo():
                                 abajoApretada = True
                         elif evento.key == K_1:
                                 jugador.aumentarVida(tiempo)
-                        if evento.key == K_2:
+                        elif evento.key == K_2:
                                 disparoLaserApretado=True
                         elif evento.key ==K_SPACE:
                                 disparoApretado=True
                                 
-                                
-                                
-     
+
                 if evento.type == pygame.KEYUP:
                         if evento.key == K_LEFT:
                                 izquierdaApretada = False
@@ -397,7 +414,6 @@ while jugador.sigueVivo():
         jugador.mover(izquierdaApretada, derechaApretada, arribaApretada, abajoApretada)
         ventana.blit(imagenFondo, (0, 0))
         jugador.dibujar(ventana)
-        
 
         if len(listaEnemigos) > 0:
                 for enemigo in listaEnemigos:
@@ -407,8 +423,6 @@ while jugador.sigueVivo():
                                 if not enemigo == otroEnemigo:
                                         if enemigo.rect.colliderect(otroEnemigo.rect):
                                                 enemigo.alejarse(otroEnemigo)
-
-                        # AGREGAR LAS COLISIONES PARA QUE NO SE SUPERPONGAN
                         if not enemigo.sigueVivo():
                                 listaEnemigos.remove(enemigo)
                         elif enemigo.enRango(jugador):
@@ -420,13 +434,13 @@ while jugador.sigueVivo():
                                         if y.rect.colliderect(jugador.rect):
                                                 jugador.recibirDanio(y.danio)
                                                 enemigo.listaDisparo.remove(y)
-                                        if y.rect.top < -20:
+                                        elif y.rect.top < 0:
                                                 enemigo.listaDisparo.remove(y)
-                                        elif y.rect.bottom > alto+20:
+                                        elif y.rect.bottom > alto:
                                                 enemigo.listaDisparo.remove(y)
-                                        elif y.rect.left < -20:
+                                        elif y.rect.left < 0:
                                                 enemigo.listaDisparo.remove(y)
-                                        elif y.rect.right > ancho+20:
+                                        elif y.rect.right > ancho:
                                                 enemigo.listaDisparo.remove(y)
         
         if len(jugador.listaDisparo) > 0: #aca recorro la lista de disparos pendientes del jugador
